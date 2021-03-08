@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+
+{% endblock %}
+{% block body %}
+
+<header>
+    <h1> Busca Doc </h1>
+</header>
+
+<form action="{{ url_for('search') }}" method="post">
+    <label for="query">Query:</label>
+    <input name="query" type="text" id="query" autocomplete="off" class="form-control" placeholder="Digite sua pesquisa aqui">
+    
+    <input type="submit" value="Buscar" class="btn btn-primary">
+</form>
+
+<hr>
+<br>
+
+{% if len!=0 %}
+<div class="docs">
+<form action="{{ url_for('submit', query=query) }}" method="post">
+    <input type="submit" value="Enviar" class="btn btn-primary">
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Proposição</th>
+              <th scope="col">Ementa</th>
+            </tr>
+        </thead>
+        {% for i in range(0,len) %}
+        <tr>
+            <th scope="row">
+                [{{ i+1 }}]
+                <input type="checkbox" id="doc_{{ i }}" name="doc_{{ i }}" value="{{ names[i] }}">
+            </th>
+            <td style="white-space: pre-wrap;" class="doc">
+                <a target="_blank" href="https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao={{ ids[i] }}">{{ names[i] }}</a>
+            </td>
+            <td>{{ docs[i] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</form>
+</div>
+{% endif %}
+
+{% endblock %}
