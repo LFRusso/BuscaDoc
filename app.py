@@ -1,11 +1,9 @@
 from flask import Flask, render_template, url_for, request, redirect
-from flask_ngrok import run_with_ngrok
 from datetime import datetime
 from uuid import uuid4
 import json
 
 app = Flask(__name__)
-run_with_ngrok(app)
 
 # Loading data
 import pandas as pd
