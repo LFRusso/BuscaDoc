@@ -4,6 +4,7 @@ from uuid import uuid4
 import json
 
 app = Flask(__name__)
+app.run()
 
 # Loading data
 import pandas as pd
@@ -54,8 +55,8 @@ def submit(query):
     data = {
                 "_id": str(uuid4()), 
                 "query": query, 
-                "matches": list(dict(request.form).values()), 
-                "datetime": datetime.today().strftime("%d/%m/%Y %H:%m")
+                "matches": dict(request.form), 
+                "datetime": datetime.today().strftime("%d/%m/%Y %H:%M:%S")
             }
     print()
     print(data)

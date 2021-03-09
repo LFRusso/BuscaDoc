@@ -36,7 +36,21 @@
         <tr>
             <th scope="row">
                 [{{ i+1 }}]
-                <input type="checkbox" id="doc_{{ i }}" name="doc_{{ i }}" value="{{ names[i] }}">
+                <br>
+                <div class="select-doc">
+                    <input type="radio" id="i" name="{{ names[i] }}" value="i" checked>
+                <label for="i">Irrelevante</label>
+                </div>
+
+                <div class="select-doc">
+                <input type="radio" id="r" name="{{ names[i] }}" value="r">
+                <label for="r">Relevante</label>
+                </div>
+                
+                <div class="select-doc">
+                <input type="radio" id="vr" name="{{ names[i] }}" value="vr">
+                <label for="vr">Muito Relevante</label>
+                </div>
             </th>
             <td style="white-space: pre-wrap;" class="doc">
                 <a target="_blank" href="https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao={{ ids[i] }}">{{ names[i] }}</a>
