@@ -27,4 +27,5 @@ body {
 
 .select-doc {
     display: inline-block;
+    border: 0px;
 }

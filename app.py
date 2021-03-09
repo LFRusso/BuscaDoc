@@ -4,7 +4,6 @@ from uuid import uuid4
 import json
 
 app = Flask(__name__)
-app.run()
 
 # Loading data
 import pandas as pd
@@ -42,7 +41,7 @@ def search_doc(query):
     with open("log.dat", "a+") as fp:
         fp.write(f"{query}\n")
     tokenized_query = preprocess(query)
-    top_docs = bm25.get_top_n(tokenized_query, corpus, n=10)
+    top_docs = bm25.get_top_n(tokenized_query, corpus, n=20)
     labels = [get_name(df,d, in_field="ementa") for d in top_docs]
     
     ids = [get_name(df,d, in_field="ementa", out_field="id") for d in top_docs]
@@ -68,4 +67,4 @@ def submit(query):
     return redirect(url_for("index"))
 
 if __name__=="__main__":
-    app.run()
+    app.run(host="0.0.0.0", debug=True)
