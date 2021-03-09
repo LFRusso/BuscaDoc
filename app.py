@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect
 from datetime import datetime
 from uuid import uuid4
 import json
+import urllib.parse as parse
 
 app = Flask(__name__)
 
@@ -33,11 +34,13 @@ def index():
 
 @app.route('/search', methods=["POST"])
 def search():
-    query = request.form['query']
+    query = parse.quote_plus(request.form['query'], safe='')
     return redirect(url_for("search_doc", query=query))
 
 @app.route('/search/<query>', methods=["GET", "POST"])
 def search_doc(query):
+    query = parse.unquote_plus(query)
+    print(query)
     with open("log.dat", "a+") as fp:
         fp.write(f"{query}\n")
     tokenized_query = preprocess(query)
