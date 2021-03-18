@@ -21,6 +21,9 @@
 <br>
 
 {% if len!=0 %}
+<div>
+    <b>Buscando por:</b> {{ query }}
+</div>
 <div class="docs">
 <form action="{{ url_for('submit', query=query) }}" method="post">
     <input type="submit" value="Enviar" class="btn btn-primary">
