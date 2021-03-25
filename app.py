@@ -6,7 +6,7 @@ import urllib.parse as parse
 import sqlite3
 
 app = Flask(__name__)
-con = sqlite3.connect("searches.db", check_same_thread=False)
+con = sqlite3.connect("/app/db/searches.db", check_same_thread=False)
 
 # Loading data
 import pandas as pd
@@ -42,8 +42,6 @@ def search():
 @app.route('/search/<query>', methods=["GET", "POST"])
 def search_doc(query):
     str_query = parse.unquote_plus(query)
-    with open("log.dat", "a+") as fp:
-        fp.write(f"{query}\n")
     tokenized_query = preprocess(str_query)
     top_docs = bm25.get_top_n(tokenized_query, corpus, n=20)
     labels = [get_name(df,d, in_field="ementa") for d in top_docs]
