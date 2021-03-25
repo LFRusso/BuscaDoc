@@ -1,5 +1,3 @@
 #! /bin/bash
 
-#docker build . -t flask-uwsgi && docker run -it -v ~/buscadoc:/app/db -p 5000:5000 flask-uwsgi
-#docker build . -t flask-uwsgi && docker run -v /app/db:/home/russo/Documents/Camara/BuscaDoc/db/ -p 5000:5000 flask-uwsgi
-docker build . -t flask-uwsgi && docker run -it -p 5000:5000 flask-uwsgi
+docker build . -t flask-uwsgi && docker run -it --name flask_uwsgi -p 5000:5000 flask-uwsgi
