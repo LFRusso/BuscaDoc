@@ -53,7 +53,9 @@ def search():
         data = {'text': query, 'num_proposicoes': 10}
         
         resp = requests.post("http://localhost:5000/", json=data)
-        
+        if (resp.status_code == 500):
+            return render_template("index.html", docs=None, names=None, len=0)
+    
         results = json.loads(resp.content)
         top_docs = [results[i]["ementa"] for i in range(10)]
         labels = [results[i]["id"] for i in range(10)]

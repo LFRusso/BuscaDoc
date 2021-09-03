@@ -39,12 +39,18 @@ connection = psycopg2.connect(host="0.0.0.0", database="admin",user="admin", pas
 (codes, names, ementas, tokenized_corpus) = load_data(connection)
 
 # Loading model with dataset
-model = BM25L(tokenized_corpus)
-
+try:
+    model = BM25L(tokenized_corpus)
+except:
+    model = None
+    
 print("===IT'S ALIVE!===")
 
 @app.route('/', methods=["POST"])
 def lookForSimilar():
+    if (model == None):
+        return Response(status=500)
+
     args = request.json
 
     try:
@@ -55,6 +61,7 @@ def lookForSimilar():
         k = args["num_proposicoes"]
     except:
         k = 20
+    k = min(k, len(codes))
 
     preprocessed_query = preprocess(query)
     
