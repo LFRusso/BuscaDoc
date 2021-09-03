@@ -104,36 +104,6 @@ para executar diretamente ou então
 bash autorun
 ```
 
-## 2. Execução com o docker-compose
-
-### 2.1 Inicializando Banco
-
-Igual descrito em [1.1](#1.1)
-
-### 2.2 lookForSimilar
-
-No diretório `lookForSimilar`, execute
-
-```
-docker-compose up -d
-```
-
-### 2.3 scoringApi
-
-No diretório `scoringApi`, execute
-
-```
-docker-compose up -d
-```
-
-### 2.4 frontend
-
-No diretório `frontend`, execute
-
-```
-docker-compose up -d
-```
-
 # 3. Modo Uso
 
 Ao acessar o endereço `http://localhost:3000`, o usuário será apresentado à seguinte página:
