@@ -1,3 +1,0 @@
-#! /bin/bash
-
-docker build . -t flask-uwsgi && docker run -it --name flask_uwsgi -p 5000:5000 flask-uwsgi

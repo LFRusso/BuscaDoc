@@ -1,0 +1,1 @@
+curl -X POST localhost:5001 --header "Content-Type: application/json" -d '{"query": "exemplo", "results": [{"id": "pl 1234", "class": "vr", "score": 0.4121}, {"id": "pl 5432", "class": "i", "score": 0.3222}] }'

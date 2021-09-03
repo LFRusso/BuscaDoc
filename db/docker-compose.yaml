@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+    webapp_db:
+        container_name: webapp_db
+        image: debezium/postgres
+        environment:
+            POSTGRES_USER: admin
+            POSTGRES_PASSWORD: admin
+            POSTGRES_DB: admin
+            PGDATA: /data/postgres
+            PGPORT: 5432
+        volumes:
+            - "./data:/data/postgres"
+        ports:
+            - "5432:5432"

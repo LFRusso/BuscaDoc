@@ -1,0 +1,7 @@
+ CREATE TABLE corpus (
+   code VARCHAR,
+   name VARCHAR,
+   txt_ementa VARCHAR,
+   text VARCHAR,
+   text_preprocessed VARCHAR
+);
