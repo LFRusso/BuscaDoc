@@ -57,6 +57,7 @@ def search():
             return render_template("index.html", docs=None, names=None, len=0)
     
         results = json.loads(resp.content)
+        results = results["proposicoes"]
         top_docs = [results[i]["texto"] for i in range(10)]
         labels = [results[i]["name"] for i in range(10)]
         ids = [results[i]["id"] for i in range(10)]

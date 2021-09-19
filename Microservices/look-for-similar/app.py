@@ -1,5 +1,6 @@
 from ast import literal_eval
 import json
+import requests
 import csv
 from io import StringIO
 from flask import Flask, request, jsonify, Response
@@ -114,7 +115,6 @@ def getRelationsFromTree(retrieved_doc):
         return results
 
 
-
 @app.route('/', methods=["POST"])
 def lookForSimilar():
     if (model == None):
@@ -130,14 +130,26 @@ def lookForSimilar():
         k = args["num_proposicoes"]
     except:
         k = 20
+    try: 
+        query_expansion = int(args["expansao"])
+        if (query_expansion == 0):
+            query_expansion = True
+        else:
+            query_expansion = True
+    except:
+        query_expansion = True
+    try:
+        mode = args["modo"] # 'solicitacoes' ou 'proposicoes'
+    except:
+        mode = 'proposicoes'        
+
     k = min(k, len(codes), len(names_sts))
 
-    # !!!! Expansão de query vai aqui !!!
-    #
-    #
+    if (query_expansion):
+        resp = requests.post("http://localhost:5003", json={"query": query})
+        if (resp.status_code == 200):
+            query = json.loads(resp.content)["query"]
     preprocessed_query = preprocess(query)
-    #
-    #
 
     # Recuperando das solicitações de trabalho
     selected_names_sts, selected_sts, scores_sts = retrieveSTs(preprocessed_query, k)
@@ -158,9 +170,6 @@ def lookForSimilar():
                      "arvore": relations_tree})
     
     response = {"proposicoes": resp_results, "solicitacoes": resp_results_sts}
-
-    print(response)
-    
     return jsonify(response)
 
 
