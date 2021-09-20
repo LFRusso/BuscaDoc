@@ -1,6 +1,0 @@
- CREATE TABLE feedback (
-   id SERIAL,
-   query VARCHAR,
-   user_feedback VARCHAR,
-   date_created TIMESTAMP
-);

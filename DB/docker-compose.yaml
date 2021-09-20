@@ -3,6 +3,7 @@ services:
     webapp_db:
         container_name: ulyssesdb
         image: debezium/postgres
+        restart: on-failure
         environment:
             POSTGRES_USER: admin
             POSTGRES_PASSWORD: admin
@@ -10,7 +11,9 @@ services:
             PGDATA: /data/postgres
             PGPORT: 5432
         volumes:
-            - "./data:/data/postgres"
+            - ./data:/data/postgres
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+            - ./:/var/lib/postgresql/
         ports:
             - "5432:5432"
         networks:

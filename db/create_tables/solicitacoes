@@ -1,5 +1,0 @@
-CREATE TABLE solicitacoes (
-   name VARCHAR,
-   text VARCHAR,
-   text_preprocessed VARCHAR
-);
