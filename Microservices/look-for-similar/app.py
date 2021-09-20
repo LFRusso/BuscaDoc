@@ -136,15 +136,11 @@ def lookForSimilar():
     try: 
         query_expansion = int(args["expansao"])
         if (query_expansion == 0):
-            query_expansion = True
+            query_expansion = False
         else:
             query_expansion = True
     except:
-        query_expansion = True
-    try:
-        mode = args["modo"] # 'solicitacoes' ou 'proposicoes'
-    except:
-        mode = 'proposicoes'        
+        query_expansion = True     
 
     k = min(k, len(codes), len(names_sts))
 
