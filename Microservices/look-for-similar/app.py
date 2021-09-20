@@ -18,7 +18,10 @@ INSERT_DATA_CORPUS = "INSERT INTO corpus (code, name, txt_ementa, text, text_pre
 SELECT_ROOT_BY_PROPOSICAO = "SELECT cod_proposicao_raiz FROM arvore_proposicoes WHERE cod_proposicao = {}"
 SELECT_AVORE_BY_RAIZ = "SELECT * FROM arvore_proposicoes WHERE cod_proposicao_raiz IN {}"
 
-connection = psycopg2.connect(host="0.0.0.0", database="admin",user="admin", password="admin", port=5432)
+session = requests.Session()
+session.trust_env = False
+
+connection = psycopg2.connect(host="ulyssesdb", database="admin",user="admin", password="admin", port=5432)
 app = Flask(__name__)
 
 def load_corpus(con):
@@ -146,7 +149,7 @@ def lookForSimilar():
     k = min(k, len(codes), len(names_sts))
 
     if (query_expansion):
-        resp = requests.post("http://localhost:5003", json={"query": query})
+        resp = session.post("http://expand-query:5003", json={"query": query})
         if (resp.status_code == 200):
             query = json.loads(resp.content)["query"]
     preprocessed_query = preprocess(query)
@@ -214,4 +217,4 @@ def insertDocs():
     return Response(status=201)
 
 if __name__=="__main__":
-    app.run(host="0.0.0.0", debug=True, use_reloader=False)
+    app.run(host="0.0.0.0", debug=True, use_reloader=False, port=5000)

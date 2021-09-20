@@ -1,0 +1,49 @@
+version: '3.7'
+
+services:
+    look-for-similar:
+        container_name: look-for-similar
+        build:
+            context: ./look-for-similar/
+            args:
+                - NODE_ENV=local
+        ports:
+            - "5000:5000"
+        networks:
+            - ulysses
+    save-relevance-feedback:
+        container_name: save-relevance-feedback
+        build:
+            context: ./save-relevance-feedback/
+            args:
+                - NODE_ENV=local
+        ports:
+            - "5001:5001"
+        networks:
+            - ulysses
+    look-for-referenced:
+        container_name: look-for-referenced
+        build:
+            context: ./look-for-referenced/
+            args:
+                - NODE_ENV=local
+        ports:
+            - "5002:5002"
+        networks:
+            - ulysses
+    expand-query:
+        container_name: expand-query
+        build:
+            context: ./expand-query/
+            args:
+                - NODE_ENV=local
+        ports:
+            - "5003:5003"
+        networks:
+            - ulysses
+
+networks:
+  ulysses:
+    driver : bridge
+    external:
+      name: ulysses_network

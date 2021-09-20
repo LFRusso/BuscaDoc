@@ -13,7 +13,7 @@ PL_REGEX = "[0-9]+"
 LABELS = ["ADD","ANEXO","APJ","ATC","AV","CN","EMS","INC","MPV","MSC","PL","PEC","PLP",
             "PLV","PDC","PRC","PRN","PFC","REP","REQ","RIC","RCP","SIT","ST"]
 
-connection = psycopg2.connect(host="0.0.0.0", database="admin",user="admin", password="admin", port=5432)
+connection = psycopg2.connect(host="ulyssesdb", database="admin",user="admin", password="admin", port=5432)
 app = Flask(__name__)
 
 print("===IT'S ALIVE!===")
@@ -55,7 +55,7 @@ def queryExpansion():
     except:
         return Response(status=500)
 
-    resp = requests.post("http://localhost:5002", json={"text": query})
+    resp = requests.post("http://look-for-referenced:5002", json={"text": query})
     data = json.loads(resp.content)
     for entity in data["entities"]:
         string, score = entity[0], entity[1]

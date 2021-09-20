@@ -1,9 +1,5 @@
 Flask
-numpy
-nltk
-uWSGI
 requests
 psycopg2
 python-dotenv
 python-crfsuite
-scikit-learn

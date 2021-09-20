@@ -1,7 +1,7 @@
 version: "3.7"
 services:
     webapp_db:
-        container_name: webapp_db
+        container_name: ulyssesdb
         image: debezium/postgres
         environment:
             POSTGRES_USER: admin
@@ -13,3 +13,8 @@ services:
             - "./data:/data/postgres"
         ports:
             - "5432:5432"
+        networks:
+            - ulysses
+networks:
+  ulysses:
+    name: ulysses_network
