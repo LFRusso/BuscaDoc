@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+    buscadoc:
+        container_name: buscadoc
+        build:
+            context: .
+            args:
+                - NODE_ENV=local
+        ports:
+            - "3000:3000"
+        networks:
+            - ulysses
+
+networks:
+  ulysses:
+    driver : bridge
+    external:
+      name: ulysses_network

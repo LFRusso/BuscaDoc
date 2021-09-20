@@ -1,5 +1,0 @@
-Flask
-numpy
-nltk
-uWSGI
-psycopg2

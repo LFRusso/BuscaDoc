@@ -8,7 +8,7 @@ INSERT_ENTRY = "INSERT INTO feedback(query, user_feedback, date_created) VALUES 
 
 app = Flask(__name__)
 
-connection = psycopg2.connect(host="0.0.0.0", database="admin",user="admin", password="admin", port=5432)
+connection = psycopg2.connect(host="ulyssesdb", database="admin",user="admin", password="admin", port=5432)
 
 def isResultValid(result):
     try:

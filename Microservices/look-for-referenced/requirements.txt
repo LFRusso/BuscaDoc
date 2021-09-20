@@ -1,0 +1,7 @@
+Flask
+numpy
+nltk
+requests
+python-dotenv
+python-crfsuite
+scikit-learn

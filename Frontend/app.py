@@ -33,7 +33,7 @@ def showDocs():
         if file and allowed_filetype(file.filename):
             filename = secure_filename(file.filename)
             content = file.read()
-            resp = requests.post("http://localhost:5000/insert", data=content)
+            resp = requests.post("http://look-for-similar:5000/insert", data=content)
 
     return render_template("docs.html", docs=None, names=None, len=0)
 
@@ -52,14 +52,15 @@ def search():
         page = request.args.get('p')
         data = {'text': query, 'num_proposicoes': 10}
         
-        resp = requests.post("http://localhost:5000/", json=data)
+        resp = requests.post("http://look-for-similar:5000/", json=data)
         if (resp.status_code == 500):
             return render_template("index.html", docs=None, names=None, len=0)
     
         results = json.loads(resp.content)
-        top_docs = [results[i]["ementa"] for i in range(10)]
-        labels = [results[i]["id"] for i in range(10)]
-        ids = [results[i]["code"] for i in range(10)]
+        results = results["proposicoes"]
+        top_docs = [results[i]["texto"] for i in range(10)]
+        labels = [results[i]["name"] for i in range(10)]
+        ids = [results[i]["id"] for i in range(10)]
         scores = [results[i]["score"] for i in range(10)]
         
         return render_template("index.html", docs=top_docs, names=labels, query=query, 
@@ -80,7 +81,7 @@ def submit(query):
     
     data = {"query": query, "results": results}
 
-    requests.post("http://localhost:5001", json=data)
+    requests.post("http://save-relevance-feedback:5001", json=data)
     return redirect(url_for("index"))
 
 if __name__=="__main__":

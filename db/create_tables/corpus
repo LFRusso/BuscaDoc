@@ -1,5 +1,5 @@
  CREATE TABLE corpus (
-   code VARCHAR,
+   code INTEGER NOT NULL,
    name VARCHAR,
    txt_ementa VARCHAR,
    text VARCHAR,
