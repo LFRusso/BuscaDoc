@@ -1,8 +1,0 @@
- CREATE TABLE arvore_proposicoes (
-   numero_sequencia INTEGER,
-   nivel INTEGER,
-   cod_proposicao INTEGER,
-   cod_proposicao_referenciada INTEGER,
-   cod_proposicao_raiz INTEGER,
-   tipo_referencia VARCHAR
-);

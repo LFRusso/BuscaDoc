@@ -1,7 +1,0 @@
- CREATE TABLE corpus (
-   code INTEGER NOT NULL,
-   name VARCHAR,
-   txt_ementa VARCHAR,
-   text VARCHAR,
-   text_preprocessed VARCHAR
-);

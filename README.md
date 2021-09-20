@@ -7,109 +7,51 @@ Uma plataforma simples para a obtenção dados para o treinamento de modelos de 
 |------------------|------------------------------------------------------------------------------------------------|----------------------------------------------|
 | corpus_small.csv | [download](https://drive.google.com/file/d/1TwrKqLzcUe_mZX18zQvxtDyiysIryDDQ/view?usp=sharing) | Contém 5000 documentos do corpus original.   |
 | corpus_full.csv  | [download](https://drive.google.com/file/d/1CcnIwmM_ydDxURkrGqVM2onEKOCNcTtq/view?usp=sharing) | Corpus original, contendo 114646 documentos. |
+| arvore-proposicoes.csv     | [download](https://drive.google.com/file/d/1WTvXoAWM-FuJIve-Pk0JED_2aNDAXMOC/view?usp=sharing)   | Árvore de proposições da Câmara dos Deputados.     |
 | new_docs.csv     | [download](https://drive.google.com/file/d/1AiIjlbTahhidRPlp7nB4dhebpgHFM2SD/view?usp=sharing)   | Arquivos para testar inserção na página.     |
 
 
-## 1. Execução sem Docker
+## 1. Execução
 
-Na raíz do projeto, execute
-
-```bash
-pip3 install -r requirements.txt
-```
-
-para realizar a instalação dos requisitos.
-
+<a name="1_1"></a>
 ### 1.1 Inicializando Banco
 
-No diretório `./db` execute o comando 
+Faça o download dos arquivos `arvore-proposicao.csv`,`solicitacoes.csv` e algum dos arquivos de *Corpus* `corpus_small.csv` ou `corpus_full.csv`. Renomeie o último para `corpus.csv` e mova todos os arquivos *csv* para dentro da pasta `./DB`
+
+Dentro do diretório `./DB`, execute o comando 
 
 ```bash
 docker-compose up -d
 ```
+ 
+Para executar o container com o banco de dados e inicializá-lo.
 
-Para criar um container com o banco postgres.
-
-Dentro do mesmo diretório, execute
-
-```bash
-bash load_schema.sh
-```
-
-ou, alternativamente, conecte-se ao banco com
-
-```bash
-bash connect.sh
-```
-
-e execute os *create tables* para as tabelas `corpus` e `feedback`.
-
-Tendo uma arquivo *.csv* no seguinte formato:
-
-![](assets/csv_db_insert.png)
-
-como os arquivos `corpus_full.csv` e `corpus_small.csv`, estes podem ser inseridos diretamente no banco executando
+É possível se conectar ao banco executando
 
 ```bash
 bash connect.csv 
 ```
 
-e, no postgres,
+### 1.2 Microsserviços
 
-```postgres
-\COPY corpus FROM 'nomedoarquivo' CSV HEADER DELIMITER ',';
-```
-
-Para parar a execução do banco, execute na mesma pasta
+Estando em execução o banco de acordo com [1.1](#1_1), dentro do diretório `./Microservices` execute:
 
 ```bash
-docker-compose down
+docker-compose up -d
 ```
 
-### 1.2 lookForSimilar
+Com isso, os microsserviços serão executados nas portas *5000-5004*.
 
-Com o banco sendo executado e os requisitos instalados, podemos executar o `lookForSimilar`. No diretório de mesmo nome, executamos:
+### 1.3 Frontend
+
+No diretório `./Frontend`, execute
 
 ```bash
-python3 app.py
+docker-compose up -d
 ```
 
-para executarmos diretamente com o `Python 3` ou então
+Para executar a página *BuscaDoc*.
 
-```bash
-python3 wsgi.py
-```
-
-para executar usando o `WSGI`.
-
-### 1.3 scoringApi
-
-No diretório `scoringApi`, execute
-
-```bash
-python3 app.py
-```
-
-para executar diretamente ou então
-
-```bash
-bash autorun
-```
-
-
-### 1.4 frontend
-
-No diretório `frontend`, execute
-
-```bash
-python3 app.py
-```
-
-para executar diretamente ou então
-
-```bash
-bash autorun
-```
 
 # 2. Modo Uso
 
@@ -133,3 +75,140 @@ de acordo com o arquivo de exemplo `new_docs.csv`. Os campos são:
 - **name**: O nome do arquivo
 - **txt_ementa**: A ementa
 - **text**: O texto completo (equivalente à *imgArquivoTeorPDF* nas bases da Câmara)
+
+
+# 3. Microsserviços
+
+## 3.1 look-for-similar
+
+Recebendo uma query do usuário e argumentos de opção de saída, retorna as $k$ *PL*s e *Solicitações de Trabalho* mais relacionadas à ela.  
+
+Executado na porta *5000*.
+
+Entrada:
+
+```json
+{
+    "text": <query>,
+    "num_proposicoes": <k proposições à serem retornadas>,
+    "expansao": <1 para realizar expansão de query, 0 para não realizar>
+}
+```
+
+Saída:
+
+```json
+{
+    "proposicoes": [
+        {
+            "id": <codigo da proposicao>,
+            "name": "PL xxx/xxxx",
+            "texto": <ementa>,
+            "score": <score do modelo>,
+            "tipo": "PR",
+            "arvore": [
+                {
+                    "numero_sequencia": <numero_sequencia>,
+                    "nivel": <nivel>,
+                    "cod_proposicao": <cod_proposicao>,
+                    "cod_proposicao_referenciada": <cod_proposicao_referenciada>,
+                    "cod_proposicao_raiz": <cod_proposicao_raiz>,
+                    "tipo_referencia": <tipo_referencia>
+                },
+                {...}
+            ]
+        },
+        {...}
+    ],
+    "solicitacoes": [
+        {
+            "name": "PL xxx/xxxx",
+            "texto": <solicitação de tabalho>,
+            "score": <score do modelo>,
+            "tipo": "ST"
+        },
+        {...}
+    ]
+}
+```
+
+## 3.2 save-relevance-feedback
+
+Serviço auxiliar para *improve-similarity* e avaliação do modelo. Recebe feedback do usuário sobre o retorno do modelo para dada query.
+
+Executado na porta *5001*.
+
+Entrada:
+
+```json
+{
+    "query": <query>,
+    "results": [
+        {
+            "id": <codigo da proposicao>,
+            "class": <classificação de relevância pelo usuário>,
+            "score": <score dado pelo modelo>
+        },
+        {...}
+    ]
+}
+```
+
+Dada uma request válida, os dados serão cadastrados na tabela *feedback* no banco.
+
+## 3.3 look-for-referenced
+
+Recebe um texto de entrada e retora as entidades (como por exemplo *PL*s, Leis e apelidos de lei referenciados) presentes nele
+
+Executado na porta *5002*.
+
+Entrada:
+
+```json
+{
+    "text": <texto de entrada>
+}
+```
+
+Saída:
+
+```json
+{
+    "entities": [
+        ("PL xxx/xxxx", <score>),
+        ("Projeto de lei xxx de 20xx", <score>),
+        ("Lei número xxxxx", <score>),
+        ("CLT", <score>),
+        (...)
+    ]
+}
+```
+
+## 3.4 expand-query
+
+Dado uma query de entrada, utiliza as entidades recuperadas pelo microsserviço **look-for-referenced** para expandi-la usando as ementas de *PL*s ou solicitações de trabalho citadas.
+
+Executado na porta *5003*.
+
+Entrada:
+
+```json
+{
+    "query": <query>
+}
+```
+
+Saída:
+
+```json
+{
+    "query": <query expandida>,
+    "entities": [
+        ("PL xxx/xxxx", <score>),
+        ("Projeto de lei xxx de 20xx", <score>),
+        ("Lei número xxxxx", <score>),
+        ("CLT", <score>),
+        (...)
+    ]
+}
+```
