@@ -29,7 +29,7 @@ Para executar o container com o banco de dados e inicializá-lo.
 É possível se conectar ao banco executando
 
 ```bash
-bash connect.csv 
+bash connect.sh 
 ```
 
 ### 1.2 Microsserviços

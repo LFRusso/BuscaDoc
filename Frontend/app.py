@@ -50,7 +50,7 @@ def search():
     if (request.method == "GET"):
         query = request.args.get('q')
         page = request.args.get('p')
-        data = {'text': query, 'num_proposicoes': 10. 'expansao':1}
+        data = {'text': query, 'num_proposicoes': 10, 'expansao':1}
         
         resp = requests.post("http://look-for-similar:5000/", json=data)
         if (resp.status_code == 500):
