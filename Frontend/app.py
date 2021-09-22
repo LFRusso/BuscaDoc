@@ -53,18 +53,22 @@ def search():
         data = {'text': query, 'num_proposicoes': 10, 'expansao':1}
         
         resp = requests.post("http://look-for-similar:5000/", json=data)
-        if (resp.status_code == 500):
-            return render_template("index.html", docs=None, names=None, len=0)
-    
-        results = json.loads(resp.content)
-        results = results["proposicoes"]
-        top_docs = [results[i]["texto"] for i in range(10)]
-        labels = [results[i]["name"] for i in range(10)]
-        ids = [results[i]["id"] for i in range(10)]
-        scores = [results[i]["score"] for i in range(10)]
+        print(f"status code: {resp.status_code}", flush=True)
         
-        return render_template("index.html", docs=top_docs, names=labels, query=query, 
-                                ids=ids, len=len(labels), scores=scores)
+        if (resp.status_code==200):
+            results = json.loads(resp.content)
+            results = results["proposicoes"]
+            top_docs = [results[i]["texto"] for i in range(10)]
+            labels = [results[i]["name"] for i in range(10)]
+            ids = [results[i]["id"] for i in range(10)]
+            scores = [results[i]["score"] for i in range(10)]
+            
+            return render_template("index.html", docs=top_docs, names=labels, query=query, 
+                                    ids=ids, len=len(labels), scores=scores)
+
+        else:
+            print(resp, flush=True)
+            return render_template("index.html", docs=None, names=None, len=0)
 
 @app.route("/submit/<query>", methods=["POST"])
 def submit(query):
