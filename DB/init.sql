@@ -19,6 +19,7 @@ CREATE TABLE arvore_proposicoes (
    id SERIAL,
    query VARCHAR,
    user_feedback VARCHAR,
+   extra_results VARCHAR,
    date_created TIMESTAMP
 );
 

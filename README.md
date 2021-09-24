@@ -150,7 +150,8 @@ Entrada:
             "score": <score dado pelo modelo>
         },
         {...}
-    ]
+    ],
+    "extra_results": ["PL XXXX/XXXX", "PDC XXXX/XXXX", "PEC XX/XXXX",  (...)]
 }
 ```
 

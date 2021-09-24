@@ -73,6 +73,10 @@ def search():
 @app.route("/submit/<query>", methods=["POST"])
 def submit(query):
     form_results = dict(request.form)
+
+    extra_results = [str(r).strip() for r in form_results["extra-results"].split(',')]
+    del form_results["extra-results"]
+
     form_results = [result.split("&") for result in  list(form_results.keys())]
 
     query = parse.unquote_plus(query)
@@ -83,7 +87,7 @@ def submit(query):
 
     results = [{"id": docs[i], "class": classes[i], "score": scores[i]} for i in range(len(form_results))]
     
-    data = {"query": query, "results": results}
+    data = {"query": query, "results": results, "extra_results": extra_results}
 
     requests.post("http://save-relevance-feedback:5001", json=data)
     return redirect(url_for("index"))

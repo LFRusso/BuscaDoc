@@ -4,7 +4,7 @@ import psycopg2
 import json
 
 VALID_CLASSES = ["r", "i", "vr", "d", "pr"] # relevante; irrelevante; muito relevante; duvida; pouco relevante
-INSERT_ENTRY = "INSERT INTO feedback(query, user_feedback, date_created) VALUES ('{}', '{}', '{}');"
+INSERT_ENTRY = "INSERT INTO feedback(query, user_feedback, extra_results, date_created) VALUES ('{}', '{}', '{}', '{}');"
 
 app = Flask(__name__)
 
@@ -30,11 +30,12 @@ def isResultValid(result):
 def isValid(entry):
     try:
         keys = list(entry.keys())
-        if (len(keys) != 2):
+        if (len(keys) != 3):
             return False
         
         query = entry["query"]
         results = entry["results"]
+        extra_results = entry["extra_results"]
         if (type(results) != list):
             results = json.loads(results)
 
@@ -53,10 +54,11 @@ def registerScores():
         try:
             query = data["query"]
             results = data["results"]
+            extra_results = data["extra_results"]
             date = datetime.utcnow()
 
             with connection.cursor() as cursor:
-                cursor.execute( INSERT_ENTRY.format(query, json.dumps(results), date) )
+                cursor.execute( INSERT_ENTRY.format(query, json.dumps(results), json.dumps(extra_results), date) )
                 connection.commit()
         except:
             return Response(status=500) 
