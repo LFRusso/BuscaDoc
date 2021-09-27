@@ -145,9 +145,10 @@ Entrada:
     "query": <query>,
     "results": [
         {
-            "id": <codigo da proposicao>,
+            "id": <codigo da proposicao ou solicitação de trabalho>,
             "class": <classificação de relevância pelo usuário>,
-            "score": <score dado pelo modelo>
+            "score": <score dado pelo modelo>,
+            "tipo": <'PR' ou 'ST'>
         },
         {...}
     ],

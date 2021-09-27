@@ -45,30 +45,45 @@ def index():
 def search():
     if (request.method == "POST"):
         query = parse.quote_plus(request.form['query'], safe='')
-        return redirect("/search?q="+query+"&p=1")
+        try:
+            if (request.form["search_mode"] == "on"):
+                st_search = 1
+            else:
+                st_search = 0
+        except:
+            st_search = 0
+
+        return redirect("/search?q="+query+"&m="+str(st_search))
     
     if (request.method == "GET"):
         query = request.args.get('q')
         page = request.args.get('p')
-        data = {'text': query, 'num_proposicoes': 10, 'expansao':1}
+        st_mode = request.args.get('m')
+        data = {'text': query, 'num_proposicoes': 20, 'expansao':1}
         
         resp = requests.post("http://look-for-similar:5000/", json=data)
         print(f"status code: {resp.status_code}", flush=True)
         
         if (resp.status_code==200):
             results = json.loads(resp.content)
-            results = results["proposicoes"]
-            top_docs = [results[i]["texto"] for i in range(10)]
-            labels = [results[i]["name"] for i in range(10)]
-            ids = [results[i]["id"] for i in range(10)]
-            scores = [results[i]["score"] for i in range(10)]
-            
-            return render_template("index.html", docs=top_docs, names=labels, query=query, 
-                                    ids=ids, len=len(labels), scores=scores)
+            if (st_mode == '0'):
+                results = results["proposicoes"]
+                top_docs = [results[i]["texto"] for i in range(10)]
+                labels = [results[i]["name"] for i in range(10)]
+                ids = [results[i]["id"] for i in range(10)]
+                scores = [results[i]["score"] for i in range(10)]
+                return render_template("index.html", docs=top_docs, names=labels, query=query, 
+                                    ids=ids, len=len(labels), scores=scores, st_search=False)
+            else:
+                results = results["solicitacoes"]
+                top_docs = [results[i]["texto"] for i in range(10)]
+                labels = [results[i]["name"] for i in range(10)]
+                scores = [results[i]["score"] for i in range(10)]
+                return render_template("index.html", docs=top_docs, names=labels, query=query, 
+                                    len=len(labels), scores=scores, st_search=True)
 
-        else:
-            print(resp, flush=True)
-            return render_template("index.html", docs=None, names=None, len=0)
+        print(resp, flush=True)
+        return render_template("index.html", docs=None, names=None, len=0)
 
 @app.route("/submit/<query>", methods=["POST"])
 def submit(query):
@@ -77,18 +92,22 @@ def submit(query):
     extra_results = [str(r).strip() for r in form_results["extra-results"].split(',')]
     del form_results["extra-results"]
 
-    form_results = [result.split("&") for result in  list(form_results.keys())]
+    st_search = form_results["search_mode"]
+    del form_results["search_mode"]
 
+    classes = list(form_results.values())
+    form_results = [result.split("&") for result in  list(form_results.keys())]
     query = parse.unquote_plus(query)
-    
     docs = [r[0] for r in form_results]
     scores = [r[1] for r in form_results]
-    classes = list(dict(request.form).values())
 
-    results = [{"id": docs[i], "class": classes[i], "score": scores[i]} for i in range(len(form_results))]
-    
+    if (st_search == '0'):
+        results = [{"id": docs[i], "class": classes[i], "score": scores[i], "tipo": "PR"} for i in range(len(form_results))]
+    else:
+        results = [{"id": docs[i], "class": classes[i], "score": scores[i], "tipo": "ST"} for i in range(len(form_results))]
+
     data = {"query": query, "results": results, "extra_results": extra_results}
-
+    
     requests.post("http://save-relevance-feedback:5001", json=data)
     return redirect(url_for("index"))
 

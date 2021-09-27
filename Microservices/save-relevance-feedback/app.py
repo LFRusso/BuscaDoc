@@ -13,12 +13,13 @@ connection = psycopg2.connect(host="ulyssesdb", database="admin",user="admin", p
 def isResultValid(result):
     try:
         keys = list(result.keys())
-        if (len(keys) != 3):
+        if (len(keys) != 4):
             return False
 
         score = float(result["score"])
         classification = result["class"]
         code = result["id"]
+        tipo = result["tipo"]
 
         if (classification not in VALID_CLASSES):
             return False
@@ -56,7 +57,6 @@ def registerScores():
             results = data["results"]
             extra_results = data["extra_results"]
             date = datetime.utcnow()
-
             with connection.cursor() as cursor:
                 cursor.execute( INSERT_ENTRY.format(query, json.dumps(results), json.dumps(extra_results), date) )
                 connection.commit()

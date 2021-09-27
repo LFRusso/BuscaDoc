@@ -13,7 +13,9 @@
 <form action="{{ url_for('search') }}" method="post">
     <label for="query">Query:</label>
     <input name="query" type="text" id="query" autocomplete="off" class="form-control" placeholder="Digite sua pesquisa aqui">
-    
+    <label for="search_mode">Busca por Solicitação de Trabalho:</label>
+    <input name="search_mode" type="checkbox" id="search_mode">
+    <br>
     <input type="submit" value="Buscar" class="btn btn-primary">
 </form>
 
@@ -26,13 +28,22 @@
 </div>
 <div class="docs">
 <form action="{{ url_for('submit', query=query) }}" method="post">
+    <input name="search_mode" type="hidden" id="search_mode" value="{{ st_search }}">
     <table class="table">
         <thead class="thead-dark">
+            {% if st_search %}
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">Proposição</th>
-              <th scope="col">Ementa</th>
-            </tr>
+                <th scope="col">#</th>
+                <th scope="col">Proposição</th>
+                <th scope="col">Solicitação de Trabalho</th>
+              </tr>
+            {% else %}
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Proposição</th>
+                <th scope="col">Ementa</th>
+              </tr>
+            {% endif %}
         </thead>
         {% for i in range(0,len) %}
         <tr>
@@ -55,14 +66,18 @@
                 </div>
             </th>
             <td style="white-space: pre-wrap;" class="doc">
-                <a target="_blank" href="https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao={{ ids[i] }}">{{ names[i] }}</a>
+                {% if st_search %}
+                    {{ names[i] }}
+                {% else %}
+                    <a target="_blank" href="https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao={{ ids[i] }}">{{ names[i] }}</a>
+                {% endif %}
             </td>
             <td>{{ docs[i] }}</td>
         </tr>
         {% endfor %}
     </table>
 
-    <h3>PLs Faltantes</h3>
+    <h3>Documentos Faltantes (separados por vírgula)</h3>
     <input name="extra-results" type="text" id="extra-results" autocomplete="off" class="form-control" placeholder="PL XXXX/XXXX, PL XXXX/XXXX, RIC XXXX/XXXX">
     <br>
     <input type="submit" value="Enviar" class="btn btn-primary">
