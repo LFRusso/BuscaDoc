@@ -106,7 +106,7 @@ def getRelationsFromTree(retrieved_doc):
         
         # Considerando que documento seja uma raiz
         if (len(roots) == 0):
-            roots.append(retrieved_doc)
+            roots.append((retrieved_doc,))
         
         roots = [str(i[0]) for i in roots]
         cursor.execute(SELECT_AVORE_BY_RAIZ.format("(%s)" % ",".join(roots)))
