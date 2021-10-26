@@ -34,7 +34,7 @@ def showDocs():
             filename = secure_filename(file.filename)
             content = file.read()
             resp = requests.post("http://look-for-similar:5000/insert", data=content)
-
+            
     return render_template("docs.html", docs=None, names=None, len=0)
 
 @app.route('/', methods=["GET"])
@@ -72,8 +72,9 @@ def search():
                 labels = [results[i]["name"] for i in range(10)]
                 ids = [results[i]["id"] for i in range(10)]
                 scores = [results[i]["score"] for i in range(10)]
+                scores_normalized = [results[i]["score_normalized"] for i in range(10)]
                 return render_template("index.html", docs=top_docs, names=labels, query=query, 
-                                    ids=ids, len=len(labels), scores=scores, st_search=False)
+                                    ids=ids, len=len(labels), scores=scores, scores_normalized=scores_normalized, st_search=False)
             else:
                 results = results["solicitacoes"]
                 top_docs = [results[i]["texto"] for i in range(10)]
@@ -100,11 +101,12 @@ def submit(query):
     query = parse.unquote_plus(query)
     docs = [r[0] for r in form_results]
     scores = [r[1] for r in form_results]
+    scores_normalized = [r[2] for r in form_results]
 
     if (st_search == '0'):
-        results = [{"id": docs[i], "class": classes[i], "score": scores[i], "tipo": "PR"} for i in range(len(form_results))]
+        results = [{"id": docs[i], "class": classes[i], "score": scores[i], "score_normalized": scores_normalized[i], "tipo": "PR"} for i in range(len(form_results))]
     else:
-        results = [{"id": docs[i], "class": classes[i], "score": scores[i], "tipo": "ST"} for i in range(len(form_results))]
+        results = [{"id": docs[i], "class": classes[i], "score": scores[i], "score_normalized": scores_normalized[i], "tipo": "ST"} for i in range(len(form_results))]
 
     data = {"query": query, "results": results, "extra_results": extra_results}
     

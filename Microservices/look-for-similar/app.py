@@ -80,23 +80,23 @@ print("===IT'S ALIVE!===")
 def retrieveDocuments(query, n):
     indexes = list(range(len(codes)))
 
-    slice_indexes, scores = model.get_top_n(query, indexes, n=n)
+    slice_indexes, scores, scores_normalized = model.get_top_n(query, indexes, n=n)
 
     selected_codes = codes[slice_indexes]
     selected_ementas = ementas[slice_indexes]
     selected_names = names[slice_indexes]
 
-    return selected_codes, selected_ementas, selected_names, scores
+    return selected_codes, selected_ementas, selected_names, scores, scores_normalized
 
 def retrieveSTs(query, n):
     indexes = list(range(len(names_sts)))
 
-    slice_indexes, scores = model_st.get_top_n(query, indexes, n=n)
+    slice_indexes, scores, scores_normalized = model_st.get_top_n(query, indexes, n=n)
 
     selected_sts = texto_sts[slice_indexes]
     selected_names = names_sts[slice_indexes]
 
-    return selected_names, selected_sts, scores
+    return selected_names, selected_sts, scores, scores_normalized
 
 
 def getRelationsFromTree(retrieved_doc):
@@ -151,22 +151,22 @@ def lookForSimilar():
     preprocessed_query = preprocess(query)
 
     # Recuperando das solicitações de trabalho
-    selected_names_sts, selected_sts, scores_sts = retrieveSTs(preprocessed_query, k)
+    selected_names_sts, selected_sts, scores_sts, scores_sts_normalized = retrieveSTs(preprocessed_query, k)
     resp_results_sts = list()
     for i  in range(k):
         resp_results_sts.append({"name": selected_names_sts[i], "texto": selected_sts[i].strip(), 
-                    "score": scores_sts[i], "tipo": "ST"})
+                    "score": scores_sts[i], "score_normalized": scores_sts_normalized[i], "tipo": "ST"})
     
 
     # Recuperando do corpus das proposições
-    selected_codes, selected_ementas, selected_names, scores = retrieveDocuments(preprocessed_query, k)
+    selected_codes, selected_ementas, selected_names, scores, scores_normalized = retrieveDocuments(preprocessed_query, k)
     resp_results = list()
     for i  in range(k):
         # Propostas relacionadas pela árvore de proposições
         relations_tree = getRelationsFromTree(selected_codes[i])
         resp_results.append({"id": selected_codes[i], "name": selected_names[i],  
-                    "texto": selected_ementas[i].strip(), "score": scores[i], "tipo": "PR", 
-                     "arvore": relations_tree})
+                    "texto": selected_ementas[i].strip(), "score": scores[i], "score_normalized": scores_normalized[i], 
+                    "tipo": "PR", "arvore": relations_tree})
     
     response = {"proposicoes": resp_results, "solicitacoes": resp_results_sts}
     return jsonify(response)

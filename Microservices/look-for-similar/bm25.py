@@ -59,8 +59,12 @@ class BM25:
         assert self.corpus_size == len(documents), "The documents given don't match the index corpus"
 
         scores = self.get_scores(query)
+        try:
+            scores_normalized = (scores - np.min(scores)) / (np.max(scores) - np.min(scores))
+        except:
+            scores_normalized = [0 for i in range(scores)]
         top_n = np.argsort(scores)[::-1][:n]
-        return [documents[i] for i in top_n], np.sort(scores)[::-1][:n]
+        return [documents[i] for i in top_n], np.sort(scores)[::-1][:n], np.sort(scores_normalized)[::-1][:n]
 
 
 #Implementacao do BM25L - adapta parametros para corrigir a preferencia do Okapi por documentos mais curtos

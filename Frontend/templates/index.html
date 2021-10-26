@@ -51,17 +51,17 @@
                 [{{ i+1 }}]
                 <br>
                 <div class="select-doc">
-                    <input type="radio" id="i" name="{{ names[i] }}&{{ scores[i] }}" value="i" checked>
+                    <input type="radio" id="i" name="{{ names[i] }}&{{ scores[i] }}&{{ scores_normalized[i] }}" value="i" checked>
                 <label for="i">Irrelevante</label>
                 </div>
 		<hr>
                 <div class="select-doc">
-                <input type="radio" id="pr" name="{{ names[i] }}&{{ scores[i] }}" value="pr">
+                <input type="radio" id="pr" name="{{ names[i] }}&{{ scores[i] }}&{{ scores_normalized[i] }}" value="pr">
                 <label for="pr">Pouco Relevante</label>
                 </div>
 		<hr>
                 <div class="select-doc">
-                <input type="radio" id="r" name="{{ names[i] }}&{{ scores[i] }}" value="r">
+                <input type="radio" id="r" name="{{ names[i] }}&{{ scores[i] }}&{{ scores_normalized[i] }}" value="r">
                 <label for="r">Relevante</label>
                 </div>
             </th>
