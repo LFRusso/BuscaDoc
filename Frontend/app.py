@@ -59,7 +59,7 @@ def search():
         query = request.args.get('q')
         page = request.args.get('p')
         st_mode = request.args.get('m')
-        data = {'text': query, 'num_proposicoes': 20, 'expansao':1}
+        data = {'text': query, 'num_proposicoes': 20, 'expansao':1, 'improve-similarity':1}
         
         resp = requests.post("http://look-for-similar:5000/", json=data)
         print(f"status code: {resp.status_code}", flush=True)

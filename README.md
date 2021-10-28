@@ -91,7 +91,8 @@ Entrada:
 {
     "text": <query>,
     "num_proposicoes": <k proposições à serem retornadas>,
-    "expansao": <1 para realizar expansão de query, 0 para não realizar>
+    "expansao": <1 para realizar expansão de query, 0 para não realizar>,
+    "improve-similarity": <1 para utilização do improve-similarity, 0 para não utilizar>
 }
 ```
 
