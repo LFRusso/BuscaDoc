@@ -165,9 +165,12 @@ class BM25L(BM25):
             scores_normalized = [0 for i in range(scores)]
 
         if (improve_similarity):
-            lambdas = self._lambda_calc(all_queries=past_queries, retrieved_docs=retrieved_docs, 
-                                       query=raw_query, cut=cut, delta=delta)
-            scores = self._lambda_update(scores=scores_normalized, lambdas=lambdas, names=names)
+            try:
+                lambdas = self._lambda_calc(all_queries=past_queries, retrieved_docs=retrieved_docs, 
+                                        query=raw_query, cut=cut, delta=delta)
+                scores = self._lambda_update(scores=scores_normalized, lambdas=lambdas, names=names)
+            except:
+                print("Error calculating lambdas. If there are no past feedbacks yet ignore this message.", flush=True)
 
         top_n = np.argsort(scores)[::-1][:n]
         return [documents[i] for i in top_n], np.sort(scores)[::-1][:n], np.sort(scores_normalized)[::-1][:n]

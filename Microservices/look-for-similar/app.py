@@ -78,10 +78,13 @@ except:
 print("===IT'S ALIVE!===")
 
 def getPastFeedback(con):
-    with con.cursor() as cur:
-        cur.execute("SELECT query, user_feedback FROM feedback;")
-        (queries, feedbacks) = transpose(cur.fetchall())
-    feedbacks = [literal_eval(i) for i in feedbacks]
+    try:
+        with con.cursor() as cur:
+            cur.execute("SELECT query, user_feedback FROM feedback;")
+            (queries, feedbacks) = transpose(cur.fetchall())
+        feedbacks = [literal_eval(i) for i in feedbacks]
+    except:
+        queries, feedbacks = [], []
 
     scores = []
     all_queries = []
