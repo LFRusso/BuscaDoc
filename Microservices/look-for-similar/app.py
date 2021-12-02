@@ -77,10 +77,29 @@ except:
     
 print("===IT'S ALIVE!===")
 
-def retrieveDocuments(query, n):
+def getPastFeedback(con):
+    try:
+        with con.cursor() as cur:
+            cur.execute("SELECT query, user_feedback FROM feedback;")
+            (queries, feedbacks) = transpose(cur.fetchall())
+        feedbacks = [literal_eval(i) for i in feedbacks]
+    except:
+        queries, feedbacks = [], []
+
+    scores = []
+    all_queries = []
+    for entry, q in zip(feedbacks, queries):
+        scores.append([[i["id"], float(i["score"]), float(i["score_normalized"])] for i in entry if i["class"]!='i'])
+        all_queries.append(q)
+    return all_queries, scores
+
+def retrieveDocuments(query, n, raw_query, improve_similarity, con):
     indexes = list(range(len(codes)))
 
-    slice_indexes, scores, scores_normalized = model.get_top_n(query, indexes, n=n)
+    past_queries, scores = getPastFeedback(con)
+    slice_indexes, scores, scores_normalized = model.get_top_n(query, indexes, n=n, 
+            improve_similarity=improve_similarity, raw_query= raw_query, past_queries=past_queries,
+            retrieved_docs=scores, names=names)
 
     selected_codes = codes[slice_indexes]
     selected_ementas = ementas[slice_indexes]
@@ -88,10 +107,13 @@ def retrieveDocuments(query, n):
 
     return selected_codes, selected_ementas, selected_names, scores, scores_normalized
 
-def retrieveSTs(query, n):
+def retrieveSTs(query, n, raw_query, improve_similarity, con):
     indexes = list(range(len(names_sts)))
 
-    slice_indexes, scores, scores_normalized = model_st.get_top_n(query, indexes, n=n)
+    past_queries, scores = getPastFeedback(con)
+    slice_indexes, scores, scores_normalized = model_st.get_top_n(query, indexes, n=n, 
+            improve_similarity=improve_similarity, raw_query= raw_query, past_queries=past_queries,
+            retrieved_docs=scores, names=names_sts)
 
     selected_sts = texto_sts[slice_indexes]
     selected_names = names_sts[slice_indexes]
@@ -141,6 +163,14 @@ def lookForSimilar():
             query_expansion = True
     except:
         query_expansion = True     
+    try: 
+        improve_similarity = int(args["improve-similarity"])
+        if (improve_similarity == 0):
+            improve_similarity = False
+        else:
+            improve_similarity = True
+    except:
+        improve_similarity = True   
 
     k = min(k, len(codes), len(names_sts))
 
@@ -151,7 +181,8 @@ def lookForSimilar():
     preprocessed_query = preprocess(query)
 
     # Recuperando das solicitações de trabalho
-    selected_names_sts, selected_sts, scores_sts, scores_sts_normalized = retrieveSTs(preprocessed_query, k)
+    selected_names_sts, selected_sts, scores_sts, scores_sts_normalized = retrieveSTs(preprocessed_query, k,
+                                                                                    improve_similarity=improve_similarity, raw_query=query, con=connection)
     resp_results_sts = list()
     for i  in range(k):
         resp_results_sts.append({"name": selected_names_sts[i], "texto": selected_sts[i].strip(), 
@@ -159,7 +190,8 @@ def lookForSimilar():
     
 
     # Recuperando do corpus das proposições
-    selected_codes, selected_ementas, selected_names, scores, scores_normalized = retrieveDocuments(preprocessed_query, k)
+    selected_codes, selected_ementas, selected_names, scores, scores_normalized = retrieveDocuments(preprocessed_query, k, 
+                                                                                    improve_similarity=improve_similarity, raw_query=query, con=connection)
     resp_results = list()
     for i  in range(k):
         # Propostas relacionadas pela árvore de proposições

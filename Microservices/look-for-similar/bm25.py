@@ -1,6 +1,8 @@
 import math
 import numpy as np
 from multiprocessing import Pool, cpu_count
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 class BM25:
     def __init__(self, corpus, tokenizer=None):
@@ -110,6 +112,68 @@ class BM25L(BM25):
             score += (self.idf.get(q) or 0) * ( (ctd + 0.5) * (self.k1 + 1) /
                                                ( (ctd + 0.5) + self.k1 ))
         return score
+
+
+    def _lambda_update(self, scores, lambdas, names):
+        """
+        Updates bm25 scores using the lambdas values
+        """
+
+        for i, name in enumerate(names):
+            name = name.strip()
+            if (name in lambdas.keys()):
+                scores[i] += lambdas[name]
+
+        return scores
+
+    def _lambda_calc(self, all_queries, retrieved_docs, query, cut, delta):
+        """
+        Searches for similar queries; returns dictionary
+        """
+        vectorizer = TfidfVectorizer()
+        vectorizer.fit(all_queries+[query])
+        vsm_2 = vectorizer.transform(all_queries)
+        vsm_1 = vectorizer.transform([query])
+        similarities = cosine_similarity(vsm_1, vsm_2).tolist()[0]
+
+        doc_sim = [(retrieved_docs[j], similarities[j]) for j in range(len(similarities)) if similarities[j] > cut]
+        
+        dic = {}
+        for tuple in doc_sim:
+            sim = tuple[1]
+            for doc in tuple[0]:
+                (name, score, score_norm) = doc
+                if (name in dic):
+                    dic[name] += score_norm * sim
+                else:
+                    dic[name] = score_norm * sim  # calculando a soma do produto sim*score
+
+        for key in dic:
+            dic[key] = np.log(dic[key] + 1) * delta
+        return dic
+
+    def get_top_n(self, query, documents, n=5, 
+                    improve_similarity=False, raw_query=None, past_queries=[], 
+                    retrieved_docs=[], names=[], cut=0.6, delta=0.7):
+
+        assert self.corpus_size == len(documents), "The documents given don't match the index corpus"
+
+        scores = self.get_scores(query)
+        try:
+            scores_normalized = (scores - np.min(scores)) / (np.max(scores) - np.min(scores))
+        except:
+            scores_normalized = [0 for i in range(scores)]
+
+        if (improve_similarity):
+            try:
+                lambdas = self._lambda_calc(all_queries=past_queries, retrieved_docs=retrieved_docs, 
+                                        query=raw_query, cut=cut, delta=delta)
+                scores = self._lambda_update(scores=scores_normalized, lambdas=lambdas, names=names)
+            except:
+                print("Error calculating lambdas. If there are no past feedbacks yet ignore this message.", flush=True)
+
+        top_n = np.argsort(scores)[::-1][:n]
+        return [documents[i] for i in top_n], np.sort(scores)[::-1][:n], np.sort(scores_normalized)[::-1][:n]
 
     def get_batch_scores(self, query, doc_ids):
         assert all(di < len(self.doc_freqs) for di in doc_ids)

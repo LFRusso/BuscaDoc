@@ -45,5 +45,4 @@ services:
 networks:
   ulysses:
     driver : bridge
-    external:
-      name: ulysses_network
+    name: ulysses_network
